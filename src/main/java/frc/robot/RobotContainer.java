@@ -4,33 +4,34 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.drivetrain.ArcadeDrive;
-import frc.robot.commands.drivetrain.Brakes;
-import frc.robot.commands.drivetrain.speedcontrol.Boost;
-import frc.robot.commands.drivetrain.speedcontrol.Slow;
 import frc.robot.subsystems.DriveTrain;
 
 public class RobotContainer {
 
-  public static XboxController xboxController = new XboxController(OIConstants.xboxController);
+  public static CommandXboxController xboxController = new CommandXboxController(OIConstants.xboxController);
   public static DriveTrain m_drivetrain = new DriveTrain();
   public RobotContainer() {
     configureBindings();
   }
 
   private void configureBindings() {
-    
-    m_drivetrain.setDefaultCommand(new ArcadeDrive());
-    new JoystickButton(xboxController, 5).whileTrue(new Slow());
-    new JoystickButton(xboxController, 6).whileTrue(new Boost());
-    new JoystickButton(xboxController, 1).toggleOnTrue(new Brakes());
+    m_drivetrain.setDefaultCommand(
+      new ArcadeDrive(m_drivetrain, () -> xboxController.getRawAxis(4), () -> xboxController.getRawAxis(1))
+      );
 
+    xboxController.leftBumper().whileTrue(Commands.run(m_drivetrain::slow));
+    xboxController.rightBumper().whileTrue(Commands.run(m_drivetrain::boost));
+    xboxController.a().toggleOnTrue(Commands.startEnd(m_drivetrain::setIdleBrake, m_drivetrain::setIdleCoast));
   }
+
+  public CommandXboxController getXboxController(){
+    return xboxController;
+}
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");

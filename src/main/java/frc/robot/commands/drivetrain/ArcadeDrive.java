@@ -4,15 +4,29 @@
 
 package frc.robot.commands.drivetrain;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.RobotContainer;
+import frc.robot.subsystems.DriveTrain;
 
 public class ArcadeDrive extends CommandBase {
   /** Creates a new ArcadeDrive. */
-  public ArcadeDrive() {
+
+  private final DriveTrain m_drivetrain;
+  private final DoubleSupplier m_forwardSpeed;
+  private final DoubleSupplier m_rotationSpeed;
+
+
+  public ArcadeDrive(DriveTrain drivetrain, DoubleSupplier forwardSpeed, DoubleSupplier rotationSpeed) {
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(RobotContainer.m_drivetrain);
+
+    m_drivetrain = drivetrain;
+    m_forwardSpeed = forwardSpeed;
+    m_rotationSpeed = rotationSpeed;
+
+    addRequirements(m_drivetrain);
   }
+  
 
   // Called when the command is initially scheduled.
   @Override
@@ -21,14 +35,11 @@ public class ArcadeDrive extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double forwardSpeed = RobotContainer.xboxController.getRawAxis(1);
-    double rotationSpeed = RobotContainer.xboxController.getRawAxis(4);
 
-    RobotContainer.m_drivetrain.arcadeDrive(forwardSpeed, rotationSpeed);
+    m_drivetrain.arcadeDrive(m_forwardSpeed.getAsDouble(), m_rotationSpeed.getAsDouble());
 
-    RobotContainer.m_drivetrain.baseSpeed();
+    m_drivetrain.baseSpeed();
 
-    
 
   }
 

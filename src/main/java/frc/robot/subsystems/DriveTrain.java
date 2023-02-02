@@ -15,15 +15,15 @@ import frc.robot.Constants.DriveConstants;
 
 public class DriveTrain extends SubsystemBase {
   /** Creates a new DriveTrain. */
-  public static WPI_VictorSPX rightMotorID0 = new WPI_VictorSPX(DriveConstants.rightVictorID0);
-  public static WPI_VictorSPX rightMotorID1 = new WPI_VictorSPX(DriveConstants.rightVictorID1);
-  public static WPI_TalonSRX rightTalonID2 = new WPI_TalonSRX(DriveConstants.rightTalonID2);
-  static MotorControllerGroup rightMotors = new MotorControllerGroup(rightMotorID0, rightMotorID1, rightTalonID2);
-  public static WPI_VictorSPX leftMotorID3 = new WPI_VictorSPX(DriveConstants.leftVictorID3);
-  public static WPI_VictorSPX leftMotorID4 = new WPI_VictorSPX(DriveConstants.leftVictorID4);
-  public static WPI_TalonSRX leftTalonID5 = new WPI_TalonSRX(DriveConstants.leftTalonID5);
-  static MotorControllerGroup leftMotors = new MotorControllerGroup(leftMotorID3, leftMotorID4, leftTalonID5);
-  public static DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
+  private WPI_VictorSPX rightMotorID0 = new WPI_VictorSPX(DriveConstants.rightVictorID0);
+  private WPI_VictorSPX rightMotorID1 = new WPI_VictorSPX(DriveConstants.rightVictorID1);
+  private WPI_TalonSRX rightTalonID2 = new WPI_TalonSRX(DriveConstants.rightTalonID2);
+  private MotorControllerGroup rightMotors = new MotorControllerGroup(rightMotorID0, rightMotorID1, rightTalonID2);
+  private WPI_VictorSPX leftMotorID3 = new WPI_VictorSPX(DriveConstants.leftVictorID3);
+  private WPI_VictorSPX leftMotorID4 = new WPI_VictorSPX(DriveConstants.leftVictorID4);
+  private WPI_TalonSRX leftTalonID5 = new WPI_TalonSRX(DriveConstants.leftTalonID5);
+  private MotorControllerGroup leftMotors = new MotorControllerGroup(leftMotorID3, leftMotorID4, leftTalonID5);
+  private DifferentialDrive drive = new DifferentialDrive(leftMotors, rightMotors);
   
 
   public void arcadeDrive(double forwardSpeed, double rotationSpeed) {
@@ -40,13 +40,22 @@ public class DriveTrain extends SubsystemBase {
     drive.setMaxOutput(.5);
   }
 
-  public void brakes(DriveTrain driveTrain) {
+  public void setIdleBrake() {
     rightMotorID0.setNeutralMode(NeutralMode.Brake);
     rightMotorID1.setNeutralMode(NeutralMode.Brake);
     rightTalonID2.setNeutralMode(NeutralMode.Brake);
     leftMotorID3.setNeutralMode(NeutralMode.Brake);
     leftMotorID4.setNeutralMode(NeutralMode.Brake);
     leftTalonID5.setNeutralMode(NeutralMode.Brake);
+  }
+
+  public void setIdleCoast() {
+    rightMotorID0.setNeutralMode(NeutralMode.Coast);
+    rightMotorID1.setNeutralMode(NeutralMode.Coast);
+    rightTalonID2.setNeutralMode(NeutralMode.Coast);
+    leftMotorID3.setNeutralMode(NeutralMode.Coast);
+    leftMotorID4.setNeutralMode(NeutralMode.Coast);
+    leftTalonID5.setNeutralMode(NeutralMode.Coast);
   }
 
   @Override
