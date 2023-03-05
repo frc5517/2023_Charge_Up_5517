@@ -14,7 +14,8 @@ package frc.robot;
  */
 public final class Constants {
     public static final class OIConstants {
-        public static final int xboxController = 0;
+        public static final int drController = 0;
+        public static final int opJoystick = 1;
     }
     public static final class DriveConstants {
         public static final int rightVictorID0 = 0;
@@ -23,5 +24,14 @@ public final class Constants {
         public static final int leftVictorID3 = 3;
         public static final int leftVictorID4 = 4;
         public static final int leftTalonID5 = 5;
+    }
+    public static final class ManipulatorConstants {
+        public static final int rotationSpark = 6;
+        public static final int extenderSpark = 7;
+        public static final int pinchSolenoidForward = 31;
+        public static final int pinchSolenoidReverse = 32;
+    }
+    public static final class VisionConstants {
+        public final static String camera = "Camera";
     }
 }
