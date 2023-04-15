@@ -16,17 +16,15 @@ import frc.robot.Constants.DriveConstants;
 public class DriveSubsystem extends SubsystemBase {
   /** Creates a new DriveSubsystem. */
 
-  private final MotorControllerGroup m_leftMotors = 
-  new MotorControllerGroup(
-    new WPI_VictorSPX(DriveConstants.kLeftVictorID3),
-    new WPI_VictorSPX(DriveConstants.kLeftVictorID4),
-    new WPI_TalonSRX(DriveConstants.kLeftTalonID5));
+  WPI_VictorSPX rM0 = new WPI_VictorSPX(DriveConstants.kRightVictorD0);
+  WPI_VictorSPX rM1 = new WPI_VictorSPX(DriveConstants.kRightVictorID1);
+  WPI_TalonSRX rT2 = new WPI_TalonSRX(DriveConstants.kRightTalonID2);
+  MotorControllerGroup m_rightMotors = new MotorControllerGroup(rM0, rM1, rT2);
 
-  private final MotorControllerGroup m_rightMotors =
-  new MotorControllerGroup(
-    new WPI_VictorSPX(DriveConstants.kRightVictorD0),
-    new WPI_VictorSPX(DriveConstants.kRightVictorID1),
-    new WPI_TalonSRX(DriveConstants.kRightTalonID2));
+  WPI_VictorSPX lM3 = new WPI_VictorSPX(DriveConstants.kLeftVictorID3);
+  WPI_VictorSPX lM4 = new WPI_VictorSPX(DriveConstants.kLeftVictorID3);
+  WPI_TalonSRX lT5 = new WPI_TalonSRX(DriveConstants.kLeftTalonID5);
+  MotorControllerGroup m_leftMotors = new MotorControllerGroup(lM3, lM4, lT5);
 
   private final DifferentialDrive m_drive = new DifferentialDrive(m_leftMotors, m_rightMotors);
   
@@ -42,9 +40,18 @@ public class DriveSubsystem extends SubsystemBase {
     m_drive.stopMotor();
   }
 
-  @Override
-  public void periodic() {
+  public void TeleopPeriodic() {
     // This method will be called once per scheduler run
+    double rampUpTime = 3;
+    int timeoutMs = 15;
+    rM0.configOpenloopRamp(rampUpTime, timeoutMs);
+    rM1.configOpenloopRamp(rampUpTime, timeoutMs);
+    rT2.configOpenloopRamp(rampUpTime, timeoutMs);
+    lM3.configOpenloopRamp(rampUpTime, timeoutMs);
+    lM4.configOpenloopRamp(rampUpTime, timeoutMs);
+    lT5.configOpenloopRamp(rampUpTime, timeoutMs);
+
+
     m_drive.arcadeDrive(RobotContainer.drController().getLeftY(), RobotContainer.drController().getRightX());
 
     if (RobotContainer.drController().leftBumper().getAsBoolean()) {
