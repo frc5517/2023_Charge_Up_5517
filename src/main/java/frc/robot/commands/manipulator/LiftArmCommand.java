@@ -5,24 +5,17 @@
 package frc.robot.commands.manipulator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
-import frc.robot.subsystems.Manipulator;
+import frc.robot.subsystems.ArmSubsystem;
 
-public class ExtendArm extends CommandBase {
-  /** Creates a new ExtendArm. */
-
-  private Manipulator _manipulator;
-  private CommandJoystick _opJoystick;
-
-  public ExtendArm(Manipulator manipulator, CommandJoystick opJoystick) {
+public class LiftArmCommand extends CommandBase {
+  /** Creates a new LiftArmCommand. */
+  private ArmSubsystem _armSubsystem;
+  private double _power;
+  public LiftArmCommand(ArmSubsystem armSubsystem, double liftPower) {
     // Use addRequirements() here to declare subsystem dependencies.
-
-    // Initialize requirements
-    this._manipulator = manipulator;
-    this._opJoystick = opJoystick;
-
-    addRequirements(manipulator);
-
+  this._armSubsystem = armSubsystem;
+  this._power = liftPower;
+  
   }
 
   // Called when the command is initially scheduled.
@@ -32,15 +25,14 @@ public class ExtendArm extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-
-    // Controls intake extender with operator joysticks Y axis
-    this._manipulator.extendArm(this._opJoystick.getRawAxis(1));
-
+    this._armSubsystem.raiseArm(this._power);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    this._armSubsystem.stopLift();
+  }
 
   // Returns true when the command should end.
   @Override

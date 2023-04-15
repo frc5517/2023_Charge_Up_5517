@@ -4,74 +4,94 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.OIConstants;
-import frc.robot.commands.manipulator.ExtendArm;
-import frc.robot.commands.vision.AimAtBall;
-import frc.robot.subsystems.BallVision;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Manipulator;
+import frc.robot.commands.autonomous.scoreDoubleReverse;
+import frc.robot.commands.autonomous.scoreReverse;
+import frc.robot.commands.autonomous.scoreReverseMid;
+import frc.robot.commands.drivetrain.AutoBalanceCommand;
+import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ExtenderSubsystem;
+import frc.robot.subsystems.PinchMotorSubsystem;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.PinchSubsystem;
 
 public class RobotContainer {
 
+  private final ExtenderSubsystem m_extenderSubsystem = new ExtenderSubsystem();
+  private final SendableChooser<Command> autonChooser = new SendableChooser<>();
+  private final static CommandXboxController m_drController = new CommandXboxController(0);
+  private final static CommandXboxController m_opController = new CommandXboxController(1);
+  private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  private final PinchSubsystem m_pinchSubsystem = new PinchSubsystem();
+  private final PinchMotorSubsystem m_pinchMotorSubsystem = new PinchMotorSubsystem();
+  private final AutoBalance m_autoBalance = new AutoBalance();
 
-  // Initializes controllers and subsystems for command mapping uses
-  public static CommandXboxController drController = new CommandXboxController(OIConstants.drController);
-  public static CommandJoystick opJoystick = new CommandJoystick(OIConstants.opJoystick);
-  public static DriveTrain m_drivetrain = new DriveTrain();
-  public static Manipulator m_manipulator = new Manipulator();
-  public static BallVision m_ballvision = new BallVision();
+  private final scoreDoubleReverse m_ScoreDoubleReverse = new scoreDoubleReverse(
+    m_armSubsystem, m_driveSubsystem, m_pinchSubsystem, m_drController, .7, 4.7, .3, 1, 2.9);
+  private final scoreReverseMid m_ScoreReverseMid = new scoreReverseMid(
+    m_driveSubsystem, m_pinchSubsystem, m_armSubsystem, m_extenderSubsystem, m_drController, .7, 1, .3, 3);
+  private final scoreReverse m_ScoreReverseCS = new scoreReverse(
+    m_driveSubsystem, m_pinchSubsystem, m_armSubsystem, m_drController, .7, .3, 4);
+  private final scoreReverse m_ScoreReverseOff = new scoreReverse(
+    m_driveSubsystem, m_pinchSubsystem, m_armSubsystem, m_drController, .7, .3, 5);
+  private final scoreReverse m_ScoreReverse = new scoreReverse(
+    m_driveSubsystem, m_pinchSubsystem, m_armSubsystem, m_drController, .7, .3, 3);
+  private final scoreReverse m_scoreOnly = new scoreReverse(
+    m_driveSubsystem, m_pinchSubsystem, m_armSubsystem, m_drController, 0, .3, 0);
+  private final AutoBalanceCommand m_Balance = new AutoBalanceCommand(
+    m_driveSubsystem, m_autoBalance, 1);
 
   public RobotContainer() {
+    SmartDashboard.putData("Autonomous Chooser", autonChooser);
+
+    CameraServer.startAutomaticCapture().setResolution(360, 360);
+
+    autonChooser.addOption("Score leave then balance", m_ScoreDoubleReverse);
+    autonChooser.addOption("Score mid then reverse", m_ScoreReverseMid);
+    autonChooser.addOption("Score then balance", m_ScoreReverseCS);
+    autonChooser.addOption("Score then leave over chargestation", m_ScoreReverseOff);
+    autonChooser.setDefaultOption("Score then leave", m_ScoreReverse);
+    autonChooser.addOption("Score only", m_scoreOnly);
+    autonChooser.addOption("Balance", m_Balance);
+    autonChooser.addOption("Do Nothing", null);
+
     configureBindings();
   }
 
   private void configureBindings() {
-
-    /* Drivetrain Command to drive the robot */
-    m_drivetrain.setDefaultCommand(new AimAtBall(m_drivetrain, m_ballvision, drController));
-
-    /* ExtendArm default command to extend the arm with Joystick axis */
-    m_manipulator.setDefaultCommand(new ExtendArm(m_manipulator, opJoystick));
-
-    /* Driver Controller Inputs */
-    // Speed Controls
-    drController.leftBumper().whileTrue(Commands.run(m_drivetrain::slow, m_drivetrain));
-    drController.rightBumper().whileTrue(Commands.run(m_drivetrain::boost, m_drivetrain));
-    // Coast/Brake Control
-    drController.start().toggleOnTrue(Commands.startEnd(m_drivetrain::setIdleBrake, m_drivetrain::setIdleCoast));
-    // Vision WIP
-    drController.a().toggleOnTrue(Commands.startEnd(m_ballvision::conePipe, m_ballvision::cubePipe, m_ballvision));
-
-    /* Operator Joystick Inputs */
-    // Arm rotation control
-    opJoystick.button(2).whileTrue(Commands.startEnd(() -> m_manipulator.lowerArm(0.5),() -> m_manipulator.stopRotation(), m_manipulator));
-    opJoystick.button(3).whileTrue(Commands.startEnd(() -> m_manipulator.raiseArm(.5), m_manipulator::stopRotation, m_manipulator));
+   // m_opController.a().whileTrue(Commands.startEnd(m_extenderSubsystem::retractArm, m_extenderSubsystem::stopExtender, m_extenderSubsystem));
+   // m_opController.y().whileTrue(Commands.startEnd(m_extenderSubsystem::extendArm, m_extenderSubsystem::stopExtender, m_extenderSubsystem));
     // Intake pinch control
-    opJoystick.button(1).onTrue(Commands.runOnce(m_manipulator::pinchToggle, m_manipulator));
+    m_opController.rightTrigger().toggleOnTrue(Commands.startEnd(m_pinchSubsystem::pinchTrue, m_pinchSubsystem::pinchFalse, m_pinchSubsystem));
+    // WIP Lift setpoint subsystem command mapping
+    m_opController.povUp().whileTrue(Commands.startEnd(() -> m_armSubsystem.lowerArm(.7), m_armSubsystem::stopLift, m_armSubsystem));
+    m_opController.povDown().whileTrue(Commands.startEnd(() -> m_armSubsystem.raiseArm(.7), m_armSubsystem::stopLift, m_armSubsystem));
 
+    m_opController.leftBumper().whileTrue(Commands.startEnd(m_pinchMotorSubsystem::IntakeIn, m_pinchMotorSubsystem::stopMotors, m_pinchMotorSubsystem));
+    m_opController.rightBumper().whileTrue(Commands.startEnd(m_pinchMotorSubsystem::IntakeOut, m_pinchMotorSubsystem::stopMotors, m_pinchMotorSubsystem));
+    
+    m_opController.start().toggleOnTrue(Commands.startEnd(m_extenderSubsystem::highSoft, m_extenderSubsystem::midSoft, m_extenderSubsystem));
   }
 
-  // Forwards driver controller to commands for inline use
-  public CommandXboxController getXboxController() {
-    return drController;
-}
-
-  // Forwards operator joystick to commands for inline use
-  public CommandJoystick getJoystick() {
-    return opJoystick;
-  }
-
-  // Autonomous commands 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return autonChooser.getSelected();
   }
 
-  public void teleopPeriodic() {
+  public static CommandXboxController drController() {
+    return m_drController;
   }
-  
 
+  public static CommandXboxController opController() {
+    return m_opController;
+  }
+
+  public void periodic() {
+
+  }
 }

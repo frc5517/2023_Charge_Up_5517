@@ -15,23 +15,31 @@ package frc.robot;
 public final class Constants {
     public static final class OIConstants {
         public static final int drController = 0;
-        public static final int opJoystick = 1;
+        public static final int opController = 1;
     }
     public static final class DriveConstants {
-        public static final int rightVictorID0 = 0;
-        public static final int rightVictorID1 = 1;
-        public static final int rightTalonID2 = 2;
-        public static final int leftVictorID3 = 3;
-        public static final int leftVictorID4 = 4;
-        public static final int leftTalonID5 = 5;
+        public static final int kRightVictorD0 = 0;
+        public static final int kRightVictorID1 = 1;
+        public static final int kRightTalonID2 = 2;
+        public static final int kLeftVictorID3 = 3;
+        public static final int kLeftVictorID4 = 4;
+        public static final int kLeftTalonID5 = 5;
+
+        public static final double BEAM_BALANACED_DRIVE_KP = 0.015; // P (Proportional) constant of a PID loop
+        public static final double BEAM_BALANCED_GOAL_DEGREES = 0;
+        public static final double BEAM_BALANCED_ANGLE_TRESHOLD_DEGREES = 1;
+        public static final double BACKWARDS_BALANCING_EXTRA_POWER_MULTIPLIER = 1.35;
+
     }
     public static final class ManipulatorConstants {
-        public static final int rotationSpark = 6;
+        public static final int liftSpark = 6;
         public static final int extenderSpark = 7;
         public static final int pinchSolenoidForward = 31;
         public static final int pinchSolenoidReverse = 32;
     }
     public static final class VisionConstants {
         public final static String camera = "Camera";
+        public final static int conePipe = 0;
+        public final static int cubePipe = 1;
     }
 }
