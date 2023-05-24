@@ -42,7 +42,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   public void TeleopPeriodic() {
     // This method will be called once per scheduler run
-    double rampUpTime = 3;
+    double rampUpTime = 2;
     int timeoutMs = 15;
     rM0.configOpenloopRamp(rampUpTime, timeoutMs);
     rM1.configOpenloopRamp(rampUpTime, timeoutMs);
